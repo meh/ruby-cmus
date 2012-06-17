@@ -17,14 +17,17 @@ class Toggle
 		@controller = controller
 	end
 
+	# toggle the repeat status
 	def repeat
 		controller.puts 'toggle repeat'
 	end
 
+	# toggle the shuffle status
 	def shuffle
 		controller.puts 'toggle shuffle'
 	end
 
+	# toggle the pause status
 	def pause
 		controller.puts 'player-pause'
 	end

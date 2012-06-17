@@ -16,6 +16,9 @@ require 'cmus/controller/status'
 
 module Cmus
 
+# This is the main class to manage cmus.
+#
+# The class also acts as a UNIXSocket if needed.
 class Controller
 	attr_reader :path
 
@@ -32,24 +35,29 @@ class Controller
 		@socket.__send__ id, *args, &block
 	end
 
+	# clear the context
 	def clear (context = :playlist)
 		puts "clear -#{context.to_s[0]}"
 	end
 
+	# add a file to the context
 	def add (context = :playlist, *paths)
 		paths.flatten.compact.uniq.each {|path|
 			puts "clear -#{context.to_s[0]} #{path}"
 		}
 	end
 
+	# returns the toggle facilities
 	def toggle
 		Toggle.new(self)
 	end
 
+	# returns the player facilities
 	def player
 		Player.new(self)
 	end
 
+	# returns the status
 	def status
 		Status.new(self)
 	end
