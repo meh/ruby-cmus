@@ -5,7 +5,7 @@ Gem::Specification.new {|s|
 	s.version      = Cmus.version
 	s.author       = 'meh.'
 	s.email        = 'meh@paranoici.org'
-	s.homepage     = 'http://github.com/meh/LOLastfm'
+	s.homepage     = 'http://github.com/meh/ruby-cmus'
 	s.platform     = Gem::Platform::RUBY
 	s.summary      = 'cmus remote controller library.'
 
