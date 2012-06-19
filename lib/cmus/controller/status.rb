@@ -55,6 +55,18 @@ class Status
 			when :set
 				name, data = data.split ' ', 2
 
+				data = if data == 'false'
+					false
+				elsif data == 'true'
+					true
+				elsif (Integer(data) rescue false)
+					data.to_i
+				elsif (Float(data) rescue false)
+					data.to_f
+				else
+					data
+				end
+
 				@settings.send "#{name}=", data
 			end
 		}
