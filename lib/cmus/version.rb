@@ -10,6 +10,6 @@
 
 module Cmus
 	def self.version
-		'2.0.4.3'
+		'2.0.4.4'
 	end
 end
