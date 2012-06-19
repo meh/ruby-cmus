@@ -24,7 +24,7 @@ class Toggle
 	end
 
 	def on (name)
-		unless controller.status.settings.send(name)
+		unless on? name
 			controller.puts "toggle #{name}"
 		end
 
@@ -32,41 +32,55 @@ class Toggle
 	end
 
 	def off (name)
-		if controller.status.settings.send(name)
+		if on? name
 			controller.puts "toggle #{name}"
 		end
 
 		self
 	end
 
+	def on? (name)
+		controller.status.settings.send(name) != false
+	end
+
 	# toggle the repeat status
 	def repeat
-		toggle :Repeat
+		toggle :repeat
 	end
 
 	# enable repeat
 	def repeat!
-		on :Repeat
+		on :repeat
 	end
 
 	# disable repeat
 	def no_repeat!
-		off :Repeat
+		off :repeat
+	end
+
+	# get the repeat status
+	def repeat?
+		on? :repeat
 	end
 
 	# toggle the shuffle status
 	def shuffle
-		toggle :Shuffle
+		toggle :shuffle
 	end
 
 	# enable shuffle
 	def shuffle!
-		on :Shuffle
+		on :shuffle
 	end
 
 	# disable shuffle
 	def no_shuffle!
-		off :Shuffle
+		off :shuffle
+	end
+
+	# get the shuffle status
+	def shuffle?
+		on? :shuffle
 	end
 
 	# toggle the pause status
