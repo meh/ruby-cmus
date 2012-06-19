@@ -49,12 +49,12 @@ class Controller
 
 	# returns the toggle facilities
 	def toggle
-		Toggle.new(self)
+		@toggle ||= Toggle.new(self)
 	end
 
 	# returns the player facilities
 	def player
-		Player.new(self)
+		@player ||= Player.new(self)
 	end
 
 	# returns the status
