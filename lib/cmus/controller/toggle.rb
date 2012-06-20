@@ -18,14 +18,14 @@ class Toggle
 	end
 
 	def toggle (name)
-		controller.puts "toggle #{name}"
+		controller.send "toggle #{name}"
 
 		self
 	end
 
 	def on (name)
 		unless on? name
-			controller.puts "toggle #{name}"
+			controller.send "toggle #{name}"
 		end
 
 		self
@@ -33,59 +33,40 @@ class Toggle
 
 	def off (name)
 		if on? name
-			controller.puts "toggle #{name}"
+			controller.send "toggle #{name}"
 		end
 
 		self
 	end
 
 	def on? (name)
-		controller.status.settings.send(name) != false
+		controller.status.settings.send(name)
 	end
 
-	# toggle the repeat status
-	def repeat
-		toggle :repeat
-	end
+	%w[show_hidden continue play_library repeat_current aaa_mode play_sorted repeat shuffle show_remaining_time].each {|name|
+		option_name = name
 
-	# enable repeat
-	def repeat!
-		on :repeat
-	end
+		define_method name do
+			toggle option_name
+		end
 
-	# disable repeat
-	def no_repeat!
-		off :repeat
-	end
+		define_method "#{name}!" do
+			on option_name
+		end
 
-	# get the repeat status
-	def repeat?
-		on? :repeat
-	end
+		define_method "no_#{name}!" do
+			off option_name
+		end
 
-	# toggle the shuffle status
-	def shuffle
-		toggle :shuffle
-	end
+		define_method "#{name}?" do
+			on? option_name
+		end
+	}
 
-	# enable shuffle
-	def shuffle!
-		on :shuffle
-	end
-
-	# disable shuffle
-	def no_shuffle!
-		off :shuffle
-	end
-
-	# get the shuffle status
-	def shuffle?
-		on? :shuffle
-	end
 
 	# toggle the pause status
 	def pause
-		controller.puts 'player-pause'
+		controller.send 'player-pause'
 
 		self
 	end

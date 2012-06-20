@@ -20,49 +20,67 @@ class Player
 	# play the current selection or the passed file
 	def play (file = nil)
 		if file
-			controller.puts "player-play #{File.real_path(File.expand_path(file))}"
+			controller.send "player-play #{File.real_path(File.expand_path(file))}"
 		else
-			controller.puts 'player-play'
+			controller.send 'player-play'
 		end
+
+		self
 	end
 
 	# pause the current song
 	def pause
-		return if controller.status == :paused
+		return self if controller.status == :paused
 
-		controller.puts 'player-pause'
+		controller.send 'player-pause'
+
+		self
 	end
 
 	# unpause the current song
 	def unpause
-		return unless controller.status == :paused
+		return self unless controller.status == :paused
 
-		controller.puts 'player-pause'
+		controller.send 'player-pause'
+
+		self
 	end
 
 	# stop the current song
 	def stop
-		controller.puts 'player-stop'
+		controller.send 'player-stop'
+
+		self
 	end
 
 	# go to the next song in the playlist
 	def next
-		controller.puts 'player-next'
+		controller.send 'player-next'
+
+		self
 	end
 
 	# go to the previous song in the playlist
 	def prev
-		controller.puts 'player-prev'
+		controller.send 'player-prev'
+
+		self
 	end
 
 	# change the volume
 	def volume (volume)
-		controller.puts "vol #{volume}"
+		controller.send "vol #{volume}"
+		controller.check_for_error
+
+		self
 	end
 
 	# seek to the passed second
 	def seek (second)
-		controller.puts "seek #{second}"
+		controller.send "seek #{second}"
+		controller.check_for_error
+
+		self
 	end
 end
 

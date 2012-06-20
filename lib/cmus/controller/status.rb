@@ -21,15 +21,8 @@ class Status
 		@song     = OpenStruct.new
 		@settings = OpenStruct.new
 
-		controller.puts 'status'
-
-		buffer = controller.read(1)
-
-		while tmp = (controller.read_nonblock(2048) rescue nil)
-			buffer << tmp
-		end
-		
-		buffer.each_line {|line|
+		controller.send 'status'
+		controller.wait_for_data.buffer.each_line {|line|
 			type, data = line.chomp.split ' ', 2
 
 			next unless type
@@ -74,6 +67,10 @@ class Status
 		if @song.marshal_dump.empty?
 			@song = nil
 		end
+	end
+
+	def volume
+		(settings.vol_left + settings.vol_right) / 2.0
 	end
 
 	def == (other)

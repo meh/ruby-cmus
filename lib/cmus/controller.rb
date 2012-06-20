@@ -10,6 +10,7 @@
 
 require 'socket'
 
+require 'cmus/controller/window'
 require 'cmus/controller/toggle'
 require 'cmus/controller/player'
 require 'cmus/controller/status'
@@ -22,9 +23,10 @@ module Cmus
 class Controller
 	attr_reader :path
 
-	def initialize (path = '~/.cmus/socket')
-		@path   = File.expand_path(path)
-		@socket = UNIXSocket.new(@path)
+	def initialize (path = '~/.cmus/socket', timeout = 0.005)
+		@path    = File.expand_path(path)
+		@socket  = UNIXSocket.new(@path)
+		@timeout = timeout
 	end
 
 	def respond_to_missing? (id)
@@ -35,16 +37,138 @@ class Controller
 		@socket.__send__ id, *args, &block
 	end
 
+	def send (text)
+		@socket.puts(text)
+	end
+
+	def source (path)
+		send "source #{File.realpath(File.expand_path(path))}"
+		check_for_error
+
+		self
+	end
+
+	def save
+		send 'save'
+
+		self
+	end
+
+	def quit
+		send 'quit'
+
+		self
+	end
+
+	def set (name, value)
+		send "set #{name}=#{value}"
+		check_for_error
+
+		self
+	end
+
+	def set? (name)
+		send "set #{name}"
+
+		if text = check_for_error
+			text[/=(.*?)'/, 1]
+		end
+	end
+
+	def colorscheme (name)
+		send "colorscheme #{name}"
+		check_for_error
+
+		self
+	end
+
 	# clear the context
 	def clear (context = :playlist)
-		puts "clear -#{context.to_s[0]}"
+		send "clear -#{context.to_s[0]}"
+		check_for_error
+
+		self
 	end
 
 	# add a file to the context
 	def add (context = :playlist, *paths)
 		paths.flatten.compact.uniq.each {|path|
-			puts "clear -#{context.to_s[0]} #{path}"
+			send "add -#{context.to_s[0]} #{File.realpath(File.expand_path(path))}"
+			check_for_error
 		}
+
+		self
+	end
+
+	def bind (context = :common, key, command)
+		send "bind #{context} #{key} #{command}"
+		check_for_error
+
+		self
+	end
+
+	def bind! (context = :common, key, command)
+		send "bind -f #{context} #{key} #{command}"
+
+		self
+	end
+
+	def unbind (context = :common, key)
+		send "unbind #{context} #{key}"
+		check_for_error
+
+		self
+	end
+	
+	def unbind! (context = :common, key)
+		send "unbind -f #{context} #{key}"
+
+		self
+	end
+
+	def bind? (context = :common, key)
+		send "showbind #{context} #{key}"
+
+		if text = check_for_error
+			Struct.new(:context, :key, :command).new(context, *text.split(' ')[2, 2])
+		end
+	end
+
+	def mark (filter)
+		send "mark #{filter}"
+		check_for_error
+
+		self
+	end
+
+	def unmark
+		send 'unmark'
+
+		self
+	end
+
+	def update_cache
+		send 'update-cache'
+
+		self
+	end
+
+	def echo (text)
+		send "echo #{text}"
+		check_for_error
+
+		self
+	end
+
+	def filter (filter, live = false)
+		send "#{'live-' if live}filter #{filter}"
+		check_for_error
+
+		self
+	end
+
+	def window
+		@window ||= Window.new(self)
 	end
 
 	# returns the toggle facilities
@@ -60,6 +184,28 @@ class Controller
 	# returns the status
 	def status
 		Status.new(self)
+	end
+
+	def wait_for_data (timeout = @timeout)
+		IO.select([@socket], nil, nil, timeout)
+
+		buffer = ""
+
+		while tmp = (@socket.read_nonblock(4096) rescue nil)
+			buffer << tmp
+		end
+
+		buffer
+	rescue
+		nil
+	end
+
+	def check_for_error (data = nil)
+		if error = data || wait_for_data and !error.strip.empty? && error.start_with?('Error:')
+			raise ArgumentError, error.strip.split(/:\s*/, 2).last
+		end
+
+		error
 	end
 end
 

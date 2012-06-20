@@ -112,7 +112,7 @@ end
 
 if options[:raw]
 	ARGV.each {|command|
-		controller.puts command
+		controller.send command
 	}
 
 	while line = controller.readline
