@@ -98,9 +98,11 @@ if options[:status]
 		puts "duration #{status.duration}" if status.duration
 		puts "position #{status.position}" if status.position
 
-		status.tags.marshal_dump.each {|name, value|
-			puts "tag #{name} #{value}"
-		}
+		if status.song
+			status.song.marshal_dump.each {|name, value|
+				puts "tag #{name} #{value}"
+			}
+		end
 
 		status.settings.marshal_dump.each {|name, value|
 			puts "set #{name} #{value}"

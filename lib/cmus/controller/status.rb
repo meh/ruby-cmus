@@ -13,12 +13,12 @@ require 'ostruct'
 module Cmus; class Controller
 
 class Status
-	attr_reader :controller, :path, :duration, :position, :tags, :settings
+	attr_reader :controller, :path, :duration, :position, :song, :settings
 
 	def initialize (controller)
 		@controller = controller
 
-		@tags     = OpenStruct.new
+		@song     = OpenStruct.new
 		@settings = OpenStruct.new
 
 		controller.puts 'status'
@@ -50,7 +50,7 @@ class Status
 			when :tag
 				name, data = data.split ' ', 2
 
-				@tags.send "#{name}=", data
+				@song.send "#{name}=", data
 
 			when :set
 				name, data = data.split ' ', 2
@@ -70,6 +70,10 @@ class Status
 				@settings.send "#{name}=", data
 			end
 		}
+
+		if @song.marshal_dump.empty?
+			@song = nil
+		end
 	end
 
 	def == (other)
