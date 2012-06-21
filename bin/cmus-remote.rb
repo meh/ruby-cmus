@@ -95,14 +95,12 @@ if options[:status]
 	controller.status.tap {|status|
 		puts "status #{status.to_sym}"
 		puts "file #{status.path}" if status.path
-		puts "duration #{status.duration}" if status.duration
-		puts "position #{status.position}" if status.position
+		puts "duration #{status.song.duration}" if status.song.duration
+		puts "position #{status.song.position}" if status.song.position
 
-		if status.song
-			status.song.marshal_dump.each {|name, value|
-				puts "tag #{name} #{value}"
-			}
-		end
+		status.song.tags.marshal_dump.each {|name, value|
+			puts "tag #{name} #{value}"
+		}
 
 		status.settings.marshal_dump.each {|name, value|
 			puts "set #{name} #{value}"

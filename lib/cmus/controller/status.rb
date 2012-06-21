@@ -13,16 +13,25 @@ require 'ostruct'
 module Cmus; class Controller
 
 class Status
-	attr_reader :controller, :path, :duration, :position, :song, :settings
+	class Song
+		attr_reader   :controller, :tags
+		attr_accessor :file, :position, :duration
+
+		def initialize (controller)
+			@tags = OpenStruct.new
+		end
+	end
+
+	attr_reader :controller, :song, :settings
 
 	def initialize (controller)
 		@controller = controller
 
-		@song     = OpenStruct.new
+		@song     = Song.new(controller)
 		@settings = OpenStruct.new
 
 		controller.send 'status'
-		controller.wait_for_data.buffer.each_line {|line|
+		controller.wait_for_data.each_line {|line|
 			type, data = line.chomp.split ' ', 2
 
 			next unless type
@@ -32,18 +41,18 @@ class Status
 				@status = data.to_sym
 
 			when :file
-				@path = data
+				@song.file = data
 
 			when :duration
-				@duration = data.to_i
+				@song.duration = data.to_i
 
 			when :position
-				@position = data.to_i
+				@song.position = data.to_i
 
 			when :tag
 				name, data = data.split ' ', 2
 
-				@song.send "#{name}=", data
+				@song.tags.send "#{name}=", data
 
 			when :set
 				name, data = data.split ' ', 2
@@ -63,10 +72,6 @@ class Status
 				@settings.send "#{name}=", data
 			end
 		}
-
-		if @song.marshal_dump.empty?
-			@song = nil
-		end
 	end
 
 	def volume
