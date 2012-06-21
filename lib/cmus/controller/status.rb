@@ -20,6 +20,16 @@ class Status
 		def initialize (controller)
 			@tags = OpenStruct.new
 		end
+
+		%w[title artist album].each {|name|
+			define_method name do
+				tags.__send__ name
+			end
+		}
+
+		def track
+			tags.tracknumber
+		end
 	end
 
 	attr_reader :controller, :song, :settings
