@@ -39,6 +39,8 @@ class Controller
 
 	def send (text)
 		@socket.puts(text)
+
+		self
 	end
 
 	def source (path)
@@ -50,14 +52,10 @@ class Controller
 
 	def save
 		send 'save'
-
-		self
 	end
 
 	def quit
 		send 'quit'
-
-		self
 	end
 
 	def set (name, value)
@@ -109,8 +107,6 @@ class Controller
 
 	def bind! (context = :common, key, command)
 		send "bind -f #{context} #{key} #{command}"
-
-		self
 	end
 
 	def unbind (context = :common, key)
@@ -122,8 +118,6 @@ class Controller
 	
 	def unbind! (context = :common, key)
 		send "unbind -f #{context} #{key}"
-
-		self
 	end
 
 	def bind? (context = :common, key)
@@ -143,14 +137,10 @@ class Controller
 
 	def unmark
 		send 'unmark'
-
-		self
 	end
 
 	def update_cache
 		send 'update-cache'
-
-		self
 	end
 
 	def echo (text)
