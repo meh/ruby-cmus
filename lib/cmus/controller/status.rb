@@ -38,7 +38,11 @@ class Status
 
 			case type.to_sym
 			when :status
-				@status = data.to_sym
+				@status = case data.to_sym
+					when :stopped then :STOP
+					when :paused  then :PAUSE
+					else               :PLAY
+				end
 
 			when :file
 				@song.file = data
@@ -72,6 +76,8 @@ class Status
 				@settings.send "#{name}=", data
 			end
 		}
+
+		@song = nil if self == :stop
 	end
 
 	def volume
@@ -79,7 +85,7 @@ class Status
 	end
 
 	def == (other)
-		super || to_sym == other
+		super || to_sym.downcase == other.to_sym.downcase
 	end
 
 	def to_sym
