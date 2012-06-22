@@ -185,6 +185,8 @@ class Controller
 			buffer << tmp
 		end
 
+		buffer.force_encoding! 'UTF-8'
+
 		buffer
 	rescue
 		nil
